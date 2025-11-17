@@ -97,10 +97,6 @@ export interface ApiError {
 }
 
 // Request/Response types for API calls
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
 
 export interface RegisterRequest {
   email: string;

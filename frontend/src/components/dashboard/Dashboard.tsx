@@ -12,20 +12,26 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const loadDashboard = async () => {
       try {
+        console.log('Loading dashboard data...');
         dispatch(fetchDashboardStart());
         const response = await analyticsAPI.getDashboard();
+        console.log('Dashboard data loaded:', response.data);
         dispatch(fetchDashboardSuccess(response.data));
       } catch (error: any) {
+        console.error('Dashboard load failed:', error);
         dispatch(fetchDashboardFailure(error.message));
       }
     };
 
     const loadRecentConversations = async () => {
       try {
+        console.log('Loading recent conversations...');
         dispatch(fetchConversationsStart());
         const response = await conversationsAPI.getConversations({ limit: 5 });
+        console.log('Conversations loaded:', response.data);
         dispatch(fetchConversationsSuccess(response.data));
       } catch (error: any) {
+        console.error('Conversations load failed:', error);
         dispatch(fetchConversationsFailure(error.message));
       }
     };

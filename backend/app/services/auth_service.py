@@ -3,23 +3,33 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from sqlalchemy.orm import Session
 from ..models import User
 from ..config import settings
 from ..database import get_db
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthService:
     def __init__(self):
         pass
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return pwd_context.verify(plain_password, hashed_password)
+        try:
+            # Ensure both strings are properly encoded
+            return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        except ValueError as e:
+            # Handle bcrypt version compatibility issues
+            # Try with different encoding or fallback methods
+            try:
+                # Some older bcrypt implementations might need different handling
+                return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password)
+            except:
+                return False
+        except Exception:
+            return False
 
     def get_password_hash(self, password: str) -> str:
-        return pwd_context.hash(password)
+        return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
     def authenticate_user(self, db: Session, email: str, password: str) -> Optional[User]:
         user = db.query(User).filter(User.email == email).first()

@@ -16,13 +16,16 @@ const Conversations: React.FC = () => {
 
   const loadConversations = async () => {
     try {
+      console.log('Loading conversations with filters:', filters);
       dispatch(fetchConversationsStart());
       const response = await conversationsAPI.getConversations({
         channel: filters.channel || undefined,
         status: filters.status || undefined,
       });
+      console.log('Conversations loaded:', response.data);
       dispatch(fetchConversationsSuccess(response.data));
     } catch (error: any) {
+      console.error('Conversations load failed:', error);
       dispatch(fetchConversationsFailure(error.message));
     }
   };

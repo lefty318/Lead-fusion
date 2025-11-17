@@ -117,8 +117,8 @@ class Settings(BaseSettings):
     @classmethod
     def validate_database_url(cls, v: str) -> str:
         """Validate database URL format"""
-        if not v.startswith(('postgresql://', 'postgresql+psycopg2://')):
-            raise ValueError("Database URL must start with postgresql:// or postgresql+psycopg2://")
+        if not v.startswith(('postgresql://', 'postgresql+psycopg2://', 'sqlite:///')):
+            raise ValueError("Database URL must start with postgresql://, postgresql+psycopg2://, or sqlite:///")
         return v
 
     class Config:

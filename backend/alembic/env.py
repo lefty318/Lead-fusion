@@ -20,7 +20,8 @@ from app.models import User, Conversation, Message, Lead, AnalyticsEvent, Report
 config = context.config
 
 # Set the database URL from settings
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Set directly in attributes to avoid ConfigParser interpolation issues with % characters
+config.attributes['sqlalchemy.url'] = settings.database_url
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -49,7 +50,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    # Get URL from attributes first (if set), otherwise from config
+    url = config.attributes.get("sqlalchemy.url") or config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -68,11 +70,11 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    # Get URL from attributes first (if set), otherwise from config
+    db_url = config.attributes.get("sqlalchemy.url") or config.get_main_option("sqlalchemy.url")
+    # Create engine directly with the URL to avoid ConfigParser issues
+    from sqlalchemy import create_engine
+    connectable = create_engine(db_url, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
         context.configure(

@@ -14,10 +14,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = useAppSelector((state) => state.auth);
 
   const handleLogout = () => {
+    console.log('Logging out user');
     dispatch(logout());
     socketService.disconnect();
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    window.location.href = '/#/login';
   };
 
   const navigation = [

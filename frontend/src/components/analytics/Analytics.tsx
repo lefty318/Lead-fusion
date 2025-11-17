@@ -14,20 +14,24 @@ const Analytics: React.FC = () => {
 
   const loadAnalytics = async () => {
     try {
+      console.log('Loading analytics data for period:', selectedPeriod);
       dispatch(fetchDashboardStart());
       const dashboardResponse = await analyticsAPI.getDashboard(selectedPeriod);
+      console.log('Analytics dashboard loaded:', dashboardResponse.data);
       dispatch(fetchDashboardSuccess(dashboardResponse.data));
 
       dispatch(fetchPerformanceStart());
       const performanceResponse = await analyticsAPI.getPerformance();
+      console.log('Analytics performance loaded:', performanceResponse.data);
       dispatch(fetchPerformanceSuccess(performanceResponse.data));
     } catch (error: any) {
+      console.error('Analytics load failed:', error);
       dispatch(fetchDashboardFailure(error.message));
       dispatch(fetchPerformanceFailure(error.message));
     }
   };
 
-  const handleExport = async (format: string) => {
+  const handleExport = async (format: 'csv' | 'xlsx' | 'pdf') => {
     try {
       const response = await analyticsAPI.exportData(format, selectedPeriod);
       const url = window.URL.createObjectURL(new Blob([response.data]));
